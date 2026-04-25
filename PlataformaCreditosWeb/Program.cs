@@ -11,6 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
@@ -54,5 +55,31 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+
+    if (!await roleManager.RoleExistsAsync("Analista"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Analista"));
+    }
+
+
+    var analistaEmail = "analista@banco.com";
+    if (await userManager.FindByEmailAsync(analistaEmail) == null)
+    {
+        var user = new IdentityUser { UserName = analistaEmail, Email = analistaEmail, EmailConfirmed = true };
+        var result = await userManager.CreateAsync(user, "Password123!"); 
+        
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Analista");
+        }
+    }
+}
 
 app.Run();
