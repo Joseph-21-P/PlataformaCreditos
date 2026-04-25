@@ -1,0 +1,104 @@
+@model IEnumerable<PlataformaCreditosWeb.Models.SolicitudCredito>
+
+@{
+    ViewData["Title"] = "Panel de Analista";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0"><i class="bi bi-shield-lock text-primary"></i> Panel de Evaluación</h2>
+        <span class="badge bg-primary fs-6">Solicitudes Pendientes: @Model?.Count()</span>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Solicitud</th>
+                    <th>ID Usuario Cliente</th>
+                    <th>Fecha de Ingreso</th>
+                    <th>Monto a Evaluar</th>
+                    <th class="text-center">Decisión</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-secondary">#@item.Id</td>
+                            <td>@item.Cliente?.UsuarioId</td>
+                            <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-bold fs-5 text-dark">@item.MontoSolicitado.ToString("C")</td>
+                            <td class="text-center">
+                                <div class="d-inline-flex gap-2">
+                                    <form asp-action="Aprobar" method="post">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-success" onclick="return confirm('¿Aprobar por @item.MontoSolicitado.ToString("C")? Esta acción no se puede deshacer.');">
+                                            <i class="bi bi-check-lg"></i> Aprobar
+                                    </button>
+                                    </form>
+
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalRechazo-@item.Id">
+                                        <i class="bi bi-x-lg"></i> Rechazar
+                                    </button>
+                                </div>
+
+                                <div class="modal fade text-start" id="modalRechazo-@item.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-danger">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">Rechazar Solicitud #@item.Id</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form asp-action="Rechazar" method="post">
+                                                <div class="modal-body bg-light">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold text-danger">Especifique el motivo del rechazo:</label>
+                                                        <textarea name="motivo" class="form-control" rows="3" placeholder="Ej. Capacidad de pago insuficiente..." required></textarea>
+                                                        <div class="form-text">Este motivo es obligatorio y será visible para el cliente.</div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-danger">Confirmar Rechazo</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+                            <span class="text-muted fs-5">No hay solicitudes pendientes de evaluación.</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
