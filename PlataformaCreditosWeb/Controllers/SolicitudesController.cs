@@ -19,7 +19,6 @@ namespace PlataformaCreditosWeb.Controllers
             _userManager = userManager;
         }
 
-        // GET: Solicitudes/Index (Catálogo con filtros)
         public async Task<IActionResult> Index(string? estado, decimal? montoMin, decimal? montoMax, DateTime? fechaInicio, DateTime? fechaFin)
         {
             if (montoMin < 0 || montoMax < 0)
@@ -67,7 +66,6 @@ namespace PlataformaCreditosWeb.Controllers
             return View(solicitudes);
         }
 
-        // GET: Solicitudes/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -83,13 +81,13 @@ namespace PlataformaCreditosWeb.Controllers
             return View(solicitud);
         }
 
-        // GET: Solicitudes/Create
+
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Solicitudes/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MontoSolicitado")] SolicitudCredito solicitud)
@@ -104,14 +102,14 @@ namespace PlataformaCreditosWeb.Controllers
                 return View(solicitud);
             }
 
-            // 2. Cliente debe estar activo
+
             if (!cliente.Activo)
             {
                 ViewBag.ErrorMessage = "Su perfil de cliente se encuentra inactivo. No puede solicitar créditos.";
                 return View(solicitud);
             }
 
-            // 3. No permitir más de una solicitud Pendiente por cliente
+
             bool tienePendiente = await _context.SolicitudesCredito
                 .AnyAsync(s => s.ClienteId == cliente.Id && s.Estado == "Pendiente");
             
@@ -121,7 +119,7 @@ namespace PlataformaCreditosWeb.Controllers
                 return View(solicitud);
             }
 
-            // 4. El monto solicitado no puede superar 10 veces los ingresos mensuales
+  
             decimal limiteMonto = cliente.IngresosMensuales * 10;
             if (solicitud.MontoSolicitado > limiteMonto)
             {
@@ -130,7 +128,7 @@ namespace PlataformaCreditosWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                // Completamos los datos requeridos por el modelo
+
                 solicitud.ClienteId = cliente.Id;
                 solicitud.FechaSolicitud = DateTime.Now;
                 solicitud.Estado = "Pendiente";
@@ -140,8 +138,8 @@ namespace PlataformaCreditosWeb.Controllers
 
                 // Feedback claro de éxito
                 ViewBag.SuccessMessage = "¡Su solicitud de crédito ha sido registrada exitosamente y está en evaluación!";
-                ModelState.Clear(); // Limpiamos el formulario
-                return View(new SolicitudCredito()); // Devolvemos un modelo limpio
+                ModelState.Clear(); 
+                return View(new SolicitudCredito()); 
             }
 
             return View(solicitud);
