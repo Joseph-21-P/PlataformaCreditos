@@ -18,7 +18,7 @@ Sistema web interno para la gestión y evaluación de solicitudes de crédito.
 - `ASPNETCORE_ENVIRONMENT`: Production
 - `ASPNETCORE_URLS`: http://0.0.0.0:${PORT}
 - `ConnectionStrings__DefaultConnection`: DataSource=app.db
-- `Redis__ConnectionString`: [Tu URL de Redis Labs]
+- `Redis__ConnectionString`: "redis-12841.c9.us-east-1-2.ec2.cloud.redislabs.com:12841"
 
 ## URL de Despliegue
-[INSERTAR TU URL DE RENDER AQUÍ]
+https://plataformacreditos-vkc0.onrender.com
