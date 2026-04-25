@@ -1,5 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@{
+    // Declaramos las variables aquí arriba para evitar conflictos de sintaxis de Razor
+    var ultimaSolId = HttpContextAccessor.HttpContext?.Session.GetString("UltimaSolicitudId");
+    var ultimaSolMonto = HttpContextAccessor.HttpContext?.Session.GetString("UltimaSolicitudMonto");
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -24,14 +29,6 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.IsInRole("Analista"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Analista" asp-action="Index">
-                                        <i class="bi bi-shield-lock"></i> Panel Analista
-                                    </a>
-                                </li>
-                            }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
@@ -42,12 +39,16 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Solicitudes" asp-action="Index">Mis Solicitudes</a>
                             </li>
 
-                            @{
-                                var ultimaSolId = HttpContextAccessor.HttpContext?.Session.GetString("UltimaSolicitudId");
-                                var ultimaSolMonto = HttpContextAccessor.HttpContext?.Session.GetString("UltimaSolicitudMonto");
+                            @if (User.IsInRole("Analista"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Analista" asp-action="Index">
+                                        <i class="bi bi-shield-lock"></i> Panel Analista
+                                    </a>
+                                </li>
                             }
 
-                            @if (!string.IsNullOrEmpty(ultimaSolId))
+                            @if (!string.IsNullOrEmpty(ultimaSolId) && !string.IsNullOrEmpty(ultimaSolMonto))
                             {
                                 <li class="nav-item ms-lg-auto">
                                     <a class="nav-link text-primary fw-bold border border-primary rounded-pill px-3" 

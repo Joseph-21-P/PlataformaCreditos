@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCreditosWeb.Data;
+using PlataformaCreditosWeb.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,28 +58,47 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 
+// SCRIPT DE DATOS INICIALES (Analista, Clientes y Solicitudes)
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-
+    // 1. Crear rol Analista
     if (!await roleManager.RoleExistsAsync("Analista"))
-    {
         await roleManager.CreateAsync(new IdentityRole("Analista"));
+
+
+    if (await userManager.FindByEmailAsync("analista@banco.com") == null)
+    {
+        var analista = new IdentityUser { UserName = "analista@banco.com", Email = "analista@banco.com", EmailConfirmed = true };
+        await userManager.CreateAsync(analista, "Password123!");
+        await userManager.AddToRoleAsync(analista, "Analista");
     }
 
 
-    var analistaEmail = "analista@banco.com";
-    if (await userManager.FindByEmailAsync(analistaEmail) == null)
+    if (!dbContext.Clientes.Any())
     {
-        var user = new IdentityUser { UserName = analistaEmail, Email = analistaEmail, EmailConfirmed = true };
-        var result = await userManager.CreateAsync(user, "Password123!"); 
-        
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(user, "Analista");
-        }
+
+        var c1User = new IdentityUser { UserName = "cliente1@banco.com", Email = "cliente1@banco.com", EmailConfirmed = true };
+        await userManager.CreateAsync(c1User, "Password123!");
+        var cliente1 = new Cliente { UsuarioId = c1User.Id, IngresosMensuales = 2000, Activo = true };
+        dbContext.Clientes.Add(cliente1);
+
+
+        var c2User = new IdentityUser { UserName = "cliente2@banco.com", Email = "cliente2@banco.com", EmailConfirmed = true };
+        await userManager.CreateAsync(c2User, "Password123!");
+        var cliente2 = new Cliente { UsuarioId = c2User.Id, IngresosMensuales = 5000, Activo = true };
+        dbContext.Clientes.Add(cliente2);
+
+        await dbContext.SaveChangesAsync();
+
+
+        dbContext.SolicitudesCredito.Add(new SolicitudCredito { ClienteId = cliente1.Id, MontoSolicitado = 1500, Estado = "Pendiente", FechaSolicitud = DateTime.Now });
+        dbContext.SolicitudesCredito.Add(new SolicitudCredito { ClienteId = cliente2.Id, MontoSolicitado = 10000, Estado = "Aprobado", FechaSolicitud = DateTime.Now.AddDays(-2) });
+
+        await dbContext.SaveChangesAsync();
     }
 }
 
