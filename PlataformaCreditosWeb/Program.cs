@@ -69,7 +69,7 @@ using (var scope = app.Services.CreateScope())
     if (!await roleManager.RoleExistsAsync("Analista"))
         await roleManager.CreateAsync(new IdentityRole("Analista"));
 
-    // 2. Crear usuario Analista
+
     if (await userManager.FindByEmailAsync("analista@banco.com") == null)
     {
         var analista = new IdentityUser { UserName = "analista@banco.com", Email = "analista@banco.com", EmailConfirmed = true };
@@ -77,16 +77,16 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(analista, "Analista");
     }
 
-    // 3. Crear 2 Clientes y 2 Solicitudes (Requisito Pregunta 1)
+
     if (!dbContext.Clientes.Any())
     {
-        // Cliente 1
+
         var c1User = new IdentityUser { UserName = "cliente1@banco.com", Email = "cliente1@banco.com", EmailConfirmed = true };
         await userManager.CreateAsync(c1User, "Password123!");
         var cliente1 = new Cliente { UsuarioId = c1User.Id, IngresosMensuales = 2000, Activo = true };
         dbContext.Clientes.Add(cliente1);
 
-        // Cliente 2
+
         var c2User = new IdentityUser { UserName = "cliente2@banco.com", Email = "cliente2@banco.com", EmailConfirmed = true };
         await userManager.CreateAsync(c2User, "Password123!");
         var cliente2 = new Cliente { UsuarioId = c2User.Id, IngresosMensuales = 5000, Activo = true };
@@ -94,7 +94,7 @@ using (var scope = app.Services.CreateScope())
 
         await dbContext.SaveChangesAsync();
 
-        // Solicitudes iniciales
+
         dbContext.SolicitudesCredito.Add(new SolicitudCredito { ClienteId = cliente1.Id, MontoSolicitado = 1500, Estado = "Pendiente", FechaSolicitud = DateTime.Now });
         dbContext.SolicitudesCredito.Add(new SolicitudCredito { ClienteId = cliente2.Id, MontoSolicitado = 10000, Estado = "Aprobado", FechaSolicitud = DateTime.Now.AddDays(-2) });
 
