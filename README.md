@@ -20,5 +20,12 @@ Sistema web interno para la gestión y evaluación de solicitudes de crédito.
 - `ConnectionStrings__DefaultConnection`: DataSource=app.db
 - `Redis__ConnectionString`: "redis-12841.c9.us-east-1-2.ec2.cloud.redislabs.com:12841"
 
+#Usuarios de prueba 
+Analista:
+analista@banco.com / Contraseña: Password123!
+Clientes:
+cliente1@banco.com / Contraseña: Password123!
+cliente2@banco.com / Contraseña: Password123!
+
 ## URL de Despliegue
 https://plataformacreditos-vkc0.onrender.com
